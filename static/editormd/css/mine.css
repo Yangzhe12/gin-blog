@@ -1,0 +1,50 @@
+html {
+	font-family:sans-serif;
+	-webkit-text-size-adjust:100%;
+	-ms-text-size-adjust:100%;
+	height:100%;
+}
+
+body {
+	margin:0;
+	height:100%;
+}
+
+#editor-area {
+	height:80%;
+	width:80%;
+	margin: auto; 
+}
+
+#art-title-area {
+	height:10%;
+	width:80%;
+	margin:auto;
+	position: relative;
+}
+
+#art-title-content {
+	height: 40px;
+	width: 100%;
+	margin: auto;
+	position: absolute;
+	bottom: 10px;
+	left: 0;
+	right: 0;
+}
+
+input {
+	-web-kit-appearance:none;
+	-moz-appearance: none;
+	border:1px solid;
+	border-color: #aaa;
+	text-align:left; 
+	display:block; 
+}
+
+#title-input {
+	height: 95%;
+	width: 100%;
+	border-radius:3px;
+	font-size: 24px
+}

@@ -5,9 +5,9 @@ import (
 	"net/http"
 	"strconv"
 
-	"yzBlog/models.go"
+	"gin-blog/models.go"
 
-	"yzBlog/utils"
+	"gin-blog/utils"
 
 	"github.com/gin-gonic/gin"
 )
@@ -29,5 +29,6 @@ func IndexGet(c *gin.Context) {
 
 	c.HTML(http.StatusOK, "index/index.html", gin.H{
 		"content": content,
+		"page":    "首页",
 	})
 }

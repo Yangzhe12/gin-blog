@@ -1,0 +1,35 @@
+{{define "editor/editor.html"}}
+<!DOCTYPE html>
+<html>
+<head>
+	{{template "meta.html"}}
+	<title>{{.page}} - YBlog </title>
+	<link rel="stylesheet" href="../static/editormd/css/editormd.css" />
+	<script src="../static/libs/bootstrap/jquery.min.js"></script>
+	<script src="../static/editormd/editormd.min.js"></script>
+  <link rel="stylesheet" href="../static/editormd/css/mine.css" />
+</head>
+<body>
+  <div id="art-title-area">
+  	<div id="art-title-content">
+  		<input type="text" id="title-input" name="art-title" placeholder="输入文章标题...">
+  	</div>
+  </div>
+  <div id="editor-area">
+  	<div id="editor" >
+  	    <textarea id="art-textarea" ></textarea>
+  	</div>
+  </div>
+	
+	<script type="text/javascript">
+	    $(function() {
+	        var editor = editormd("editor", {
+	            width  : "100%",
+	            height : "100%",
+	            path   : "../static/editormd/lib/"
+	        });
+	    });
+	</script>
+</body>
+</html>
+{{end}}
