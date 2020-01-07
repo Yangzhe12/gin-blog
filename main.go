@@ -6,8 +6,8 @@ import (
 	"path/filepath"
 	"strings"
 
-	"yzBlog/controllers"
-	"yzBlog/utils"
+	"gin-blog/controllers"
+	"gin-blog/utils"
 
 	"github.com/gin-gonic/gin"
 )
@@ -23,6 +23,7 @@ func main() {
 	router.LoadHTMLGlob(filepath.Join(filepath.Join(getCurrentDirectory(), "./views/**/*")))
 	router.Static("/static", filepath.Join(getCurrentDirectory(), "./static"))
 	router.GET("/", controllers.IndexGet)
+	router.GET("/editor", controllers.EditorGet)
 
 	router.Run(":8080")
 }
