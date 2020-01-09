@@ -1,0 +1,46 @@
+{{define "account/regist.html"}}
+<!DOCTYPE html>
+<html lang="zh-CN">
+  
+  <head>
+  	{{template "meta.html"}}
+    <title>{{.page}} - YBlog</title>
+    {{template "link.html"}}
+    <script src="../static/libs/bootstrap/jquery.min.js"></script>
+	</head>
+  
+  <body id="regist-body">
+    <div class="container ">
+      <form class="form-regist" method="post">
+        <h2 class="form-regist-heading">注 册</h2>
+        <div class="form-control">
+          <div class="form-name"><span>手机号</span></div>
+          <input type="text" class="form-input"  name="phone" required>
+        </div>
+        <div class="form-control">
+          <div class="form-name"><span>用户名</span></div>
+          <input type="text" class="form-input"  name="user" required>
+          <div class="form-msg"><span>用户名已存在！</span></div>
+        </div>
+        <div class="form-control">
+          <div class="form-name"><span>密码</span></div>
+          <input type="password"  class="form-input" name="pwd" required>
+        </div>
+        <div class="form-control">
+          <div class="form-name"><span>确认密码</span></div>
+          <input type="password" class="form-input"  name="repwd" required>
+        </div>
+        <div class="form-control">
+          <div class="form-name"><span>邮箱</span></div>
+          <input type="email" class="form-input"   name="email" required>
+        </div>
+        <button class="btn btn-lg btn-primary btn-block regist-btn" type="submit">注册</button>
+      </form>
+    </div>
+    <script type="text/javascript">
+      
+    </script>
+  </body>
+
+</html>
+{{end}}

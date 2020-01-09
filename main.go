@@ -23,8 +23,13 @@ func main() {
 	router.LoadHTMLGlob(filepath.Join(filepath.Join(getCurrentDirectory(), "./views/**/*")))
 	router.Static("/static", filepath.Join(getCurrentDirectory(), "./static"))
 	router.GET("/", controllers.IndexGet)
+
+	router.GET("/regist", controllers.RegistGet)
+	router.POST("/regist", controllers.RegistPost)
+
 	router.GET("/login", controllers.LoginGet)
 	router.POST("/login", controllers.LoginPost)
+
 	router.GET("/editor", controllers.EditorGet)
 
 	router.Run(":8080")
