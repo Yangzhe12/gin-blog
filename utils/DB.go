@@ -12,7 +12,7 @@ var (
 )
 
 func InitDB() (*sql.DB, error) {
-	Db, err = sql.Open("mysql", "yangzhe:Q1w2e3r$@tcp(120.27.22.159:3306)/bookstore")
+	Db, err = sql.Open("mysql", "yangzhe:Q1w2e3r$@tcp(120.27.22.159:3306)/gin_blog")
 	if err == nil {
 		return Db, err
 	}

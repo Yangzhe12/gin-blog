@@ -51,8 +51,22 @@ h6, .h6 {
   display: inline-block;
   padding: 10px;
   font-weight: 500;
+  color: #ccc;
+}
+
+.blog-nav-item-user {
+  color: #fff
+}
+
+.regist-item{
+  position: relative;
+  display: inline-block;
+  margin-bottom: 10px;
+  padding: 10px;
+  font-weight: 500;
   color: #cdddeb;
 }
+
 .blog-nav-item:hover,
 .blog-nav-item:focus {
   color: #fff;
@@ -153,6 +167,11 @@ h6, .h6 {
   color: #999;
 }
 
+.blog-test {
+  width: 200px;
+  display: inline-block;
+  padding: 0;
+}
 
 /*
  * Footer
@@ -174,16 +193,17 @@ h6, .h6 {
   display: inline-block;
 }
 
-.blog-test {
-  width: 200px;
-  display: inline-block;
-  padding: 0;
-}
 
-#login-body {
+#login-body, #regist-body {
   padding-top: 100px;
   padding-bottom: 100px;
   background-color: #eee;
+}
+
+.form-regist{
+  max-width: 530px;
+  padding: 15px;
+  margin: 0 auto;
 }
 
 .form-signin {
@@ -192,6 +212,7 @@ h6, .h6 {
   margin: 0 auto;
 }
 .form-signin .form-signin-heading,
+.form-regist .form-regist-heading,
 .form-signin .checkbox {
   margin-bottom: 10px;
 }
@@ -204,14 +225,32 @@ h6, .h6 {
   -webkit-box-sizing: border-box;
      -moz-box-sizing: border-box;
           box-sizing: border-box;
-  padding: 10px;
+  padding: 8px;
   margin: 10px 0;
   font-size: 16px;
 }
-.form-signin .form-control:focus {
+
+.form-regist .form-control {
+  position: relative;
+  height: auto;
+  -webkit-box-sizing: border-box;
+     -moz-box-sizing: border-box;
+          box-sizing: border-box;
+  padding: 10px 0px;
+  margin: 10px 0;
+  font-size: 16px;
+  background-color: rgba(0,0,0,0);
+  border-width: 0;
+  border-color: #eee;
+}
+
+.form-signin .form-control:focus,
+.form-regist .form-control:focus, {
   z-index: 2;
 }
-.form-signin input[type="email"] {
+
+
+.form-signin input[type="username"] {
   margin-bottom: -1px;
   border-bottom-right-radius: 0;
   border-bottom-left-radius: 0;
@@ -222,4 +261,40 @@ h6, .h6 {
   border-top-right-radius: 0;
 }
 
+.form-input {
+  display: inline-block;
+  width: 250px;
+  height: 30px;
+  padding: 4px;
+  background-color: #e8f0fe;
+  border-width: 1px;
+  border-color: #337ab7;
+  border-radius: 3px;
+  font-size: 14px;
+}
 
+.form-name {
+  display: inline-block;
+  width: 70px;
+}
+
+.form-msg {
+  display: inline-block;
+}
+
+.error-msg {
+  font-size: 16px;
+  color: #f00;
+}
+
+.regist-item {
+  height: 30px;
+}
+
+#regist-link {
+  font-size: 16px;
+}
+
+.regist-btn {
+  margin-right: auto;
+}
