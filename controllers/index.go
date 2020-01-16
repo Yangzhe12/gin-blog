@@ -8,6 +8,11 @@ import (
 )
 
 func IndexGet(c *gin.Context) {
+	// 检查是否登陆
+	// fmt.Println("****************1")
+	// username, _ := utils.IsLogin(c)
+	// fmt.Println("****************2")
+	username := "aaa"
 	var content [5]map[string]string
 	for i := 0; i < 5; i++ {
 		content[i] = map[string]string{
@@ -17,7 +22,8 @@ func IndexGet(c *gin.Context) {
 	}
 
 	c.HTML(http.StatusOK, "index/index.html", gin.H{
-		"content": content,
-		"page":    "首页",
+		"content":  content,
+		"page":     "首页",
+		"username": username,
 	})
 }

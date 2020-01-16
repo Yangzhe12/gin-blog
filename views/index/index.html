@@ -23,8 +23,14 @@
         </nav>
         <div class="blog-test">
           <div class="blog-nav">
-            <a class="blog-nav-item blog-nav-item-user" href="#">登陆</a>
-            <a class="blog-nav-item blog-nav-item-user" href="#">注册</a> 
+            {{if ge .username ""}}
+              <a class="blog-nav-item blog-nav-item-user" href="/login">登陆</a>
+              <a class="blog-nav-item blog-nav-item-user" href="/logout">注册</a> 
+            {{else}}
+              <a class="blog-nav-item blog-nav-item-user" href="#">{{.username}}</a>
+              <a class="blog-nav-item blog-nav-item-user" href="/logout">退出</a> 
+            {{end}}
+            
           </div>
         </div>
       </div>

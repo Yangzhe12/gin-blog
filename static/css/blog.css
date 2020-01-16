@@ -201,13 +201,13 @@ h6, .h6 {
 }
 
 .form-regist{
-  max-width: 530px;
+  max-width: 430px;
   padding: 15px;
   margin: 0 auto;
 }
 
 .form-signin {
-  max-width: 330px;
+  max-width: 350px;
   padding: 15px;
   margin: 0 auto;
 }
@@ -216,9 +216,7 @@ h6, .h6 {
 .form-signin .checkbox {
   margin-bottom: 10px;
 }
-.form-signin .checkbox {
-  font-weight: normal;
-}
+
 .form-signin .form-control {
   position: relative;
   height: auto;
@@ -263,7 +261,7 @@ h6, .h6 {
 
 .form-input {
   display: inline-block;
-  width: 250px;
+  width: 320px;
   height: 30px;
   padding: 4px;
   background-color: #e8f0fe;
@@ -278,13 +276,12 @@ h6, .h6 {
   width: 70px;
 }
 
-.form-msg {
-  display: inline-block;
-}
 
 .error-msg {
   font-size: 16px;
   color: #f00;
+  display: block;
+  margin: 0 auto;
 }
 
 .regist-item {
@@ -293,8 +290,4 @@ h6, .h6 {
 
 #regist-link {
   font-size: 16px;
-}
-
-.regist-btn {
-  margin-right: auto;
 }
