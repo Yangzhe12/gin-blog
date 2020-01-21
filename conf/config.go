@@ -7,15 +7,20 @@ import (
 )
 
 type Configuration struct {
-	CookieSecret          string `yaml:"cookie_secret"`
-	CsrfTokenValidTime    int    `yaml:"csrf_token_valid_time"`
-	CsrfTokenSecret       string `yaml:"csrf_token_secret"`
-	CookieName            string `yaml:"cookie_name"`
-	RedisAddress          string `yaml:"redis_address"`
-	RedisSessionValidTime int    `yaml:"redis_session_valid_time"`
-	UserInfoSessionSecret string `yaml:"userinfo_session_secret"`
-	UserInfoSessionKey    string `yaml:"userinfo_session_key"`
+	CookieSecret             string `yaml:"cookie_secret"`
+	CsrfTokenValidTime       int    `yaml:"csrf_token_valid_time"`
+	CsrfTokenSecret          string `yaml:"csrf_token_secret"`
+	CsrfCookieName           string `yaml:"csrf_cookie_name"`
+	RedisAddress             string `yaml:"redis_address"`
+	UserInfoSessionValidTime int    `yaml:"userinfo_session_valid_time"`
+	UserInfoSessionSecret    string `yaml:"userinfo_session_secret"`
+	UserInfoSessionKey       string `yaml:"userinfo_session_key"`
+	UserInfoCookieKey        string `yaml:"userinfo_cookie_key"`
 }
+
+const (
+	ArticlesPerPage = 5
+)
 
 var configuration *Configuration
 

@@ -52,7 +52,7 @@ $(document).ready(function(){
           var tokenData = $("#csrfToken").text()
 
           $.ajax({
-            url:"/regist",
+            url:"/v1/regist",
             type: "post",
             data: jsonData,
             contentType:"application/json",
@@ -62,7 +62,7 @@ $(document).ready(function(){
             success: function (resp) {
               if (resp.resno == "0") {
                 alert(resp.msg)
-                location.href = "/login";
+                location.href = "/v1/login";
               } else {
                 if (resp.resno == "1" | resp.resno == "2") {
                   alert(resp.msg)

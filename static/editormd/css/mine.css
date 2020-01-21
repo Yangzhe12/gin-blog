@@ -14,6 +14,7 @@ body {
 	height:80%;
 	width:80%;
 	margin: auto; 
+
 }
 
 #art-title-area {
@@ -21,6 +22,24 @@ body {
 	width:80%;
 	margin:auto;
 	position: relative;
+}
+
+#art-foot-area {
+	height:10%;
+	width:80%;
+	margin:auto;
+	position: relative;
+}
+
+#post-articel {
+	font-size: 16px;
+	display: block;
+	width: 200px;
+	height: 40px;
+	position: absolute; 
+	top: 50%; 
+	left: 50%; 
+	transform: translate(-50%, -50%);
 }
 
 #art-title-content {
@@ -42,9 +61,30 @@ input {
 	display:block; 
 }
 
-#title-input {
-	height: 95%;
+.title-div {
+	height: 40px;
+	width: 70%;
+	display: inline-block;
+}
+.btn-div {
+	height: 40px;
+	width: 25%;
+	display: inline-block;
+	margin-left: 10px;
+	margin-right: 10px;
+}
+
+#title-input{
+	display: inline-block;
+	height: 40px;
 	width: 100%;
 	border-radius:3px;
 	font-size: 24px
+}
+
+.art-btn {
+	height: 40px;
+	width: 40%;
+	border-radius:3px;
+	font-size: 16px
 }

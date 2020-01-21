@@ -1,8 +1,9 @@
+redis_address: 120.27.22.159:6379
 cookie_secret: 6fee6bc9b457de118f761bcfa550d33de6f0bee4
 csrf_token_valid_time: 600
 csrf_token_secret: 49f9fb44f3a6e739d418db33516347006d0c801a
-cookie_name: csrf_cookie
-redis_address: 120.27.22.159:6379
-redis_session_valid_time: 60488
+csrf_cookie_name: csrf_cookie
+userinfo_session_valid_time: 2592000
 userinfo_session_secret: 7f269b66c7517c1b24142a09c98de4476f813098
 userinfo_session_key: userinfo
+userinfo_cookie_key: user_cookie

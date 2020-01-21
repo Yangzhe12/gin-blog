@@ -7,13 +7,12 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/utrack/gin-csrf"
+	csrf "github.com/utrack/gin-csrf"
 )
 
 func RegistGet(c *gin.Context) {
 	// 生成csrfToken
 	csrfToken := csrf.GetToken(c)
-
 	c.HTML(http.StatusOK, "account/regist.html", gin.H{
 		"page":      "注册",
 		"csrfToken": csrfToken,
