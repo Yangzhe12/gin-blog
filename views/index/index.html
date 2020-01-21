@@ -23,8 +23,15 @@
         </nav>
         <div class="blog-test">
           <div class="blog-nav">
-            <a class="blog-nav-item blog-nav-item-user" href="#">登陆</a>
-            <a class="blog-nav-item blog-nav-item-user" href="#">注册</a> 
+            {{if .username}}
+              <a class="blog-nav-item blog-nav-item-user" href="/v1/edit">写文章</a>
+              <a class="blog-nav-item blog-nav-item-user" href="#">{{.username}}</a>
+              <a class="blog-nav-item blog-nav-item-user" href="/v1/logout">退出</a> 
+            {{else}}
+              <a class="blog-nav-item blog-nav-item-user" href="/v1/login">登陆</a>
+              <a class="blog-nav-item blog-nav-item-user" href="/v1/regist">注册</a> 
+            {{end}}
+            
           </div>
         </div>
       </div>
@@ -45,7 +52,7 @@
         {{range $a_key, $a_value:=.content}}
           <div class="blog-post page-header">
             <h2 class="blog-post-title">{{$a_value.title}}</h2>
-            <p class="blog-post-meta">2019-01-05&nbsp&nbsp&nbsp&nbsp<a href="#">{{$a_value.user}}</a></p>
+            <p class="blog-post-meta">{{$a_value.pubDateTime}}<a href="#">{{$a_value.user}}</a></p>
             <blockquote>
               <p>简述</p>
             </blockquote>

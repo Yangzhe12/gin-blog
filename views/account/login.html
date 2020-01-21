@@ -11,19 +11,18 @@
   
   <body id="login-body">
     <div class="container ">
-      <form class="form-signin" method="post">
+      <form class="form-signin">
         <h2 class="form-signin-heading">登    陆</h2>
-        <div class="login-error"><span class="error-msg">{{.msg}}</span></div>
+        <p id="csrfToken" hidden>{{.csrfToken}}</p>
+        <div class="login-error" id="error-div"><span class="error-msg"></span></div>
         <label for="inputUsername" class="sr-only">用户名</label>
         <input type="text" id="inputUsername" class="form-control" placeholder="用户名" name="username" required autofocus>
         <label for="inputPassword" class="sr-only">密  码</label>
         <input type="password" id="inputPassword" class="form-control" placeholder="密码" name="password" required>
-        <div class="regist-item"><a id="regist-link" href="/regist">注册</a></div>
+        <div class="regist-item"><a id="regist-link" href="/v1/regist">注册</a></div>
         <button class="btn btn-lg btn-primary btn-block" type="submit">登陆</button></form>
     </div>
-    <script type="text/javascript">
-      
-    </script>
+    <script src="../static/libs/gin-blog/login.js"></script>
   </body>
 
 </html>
