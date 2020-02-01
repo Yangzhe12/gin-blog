@@ -1,6 +1,6 @@
 redis_address: 120.27.22.159:6379
 cookie_secret: 6fee6bc9b457de118f761bcfa550d33de6f0bee4
-csrf_token_valid_time: 600
+csrf_token_valid_time: 300
 csrf_token_secret: 49f9fb44f3a6e739d418db33516347006d0c801a
 csrf_cookie_name: csrf_cookie
 userinfo_session_valid_time: 2592000

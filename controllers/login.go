@@ -33,11 +33,11 @@ func LoginPost(c *gin.Context) {
 	if err := c.ShouldBindJSON(&requestData); err == nil {
 
 		// 查询用户数据库，校验用户是否存在
-		loginSQL := "select id,username,password from account where username = ?"
+		loginSQL := "select username,password from account where username = ?"
 		row := utils.Db.QueryRow(loginSQL, requestData.Username)
 		var dbUsername, dbPassword string
-		var dbUserID int
-		err = row.Scan(&dbUserID, &dbUsername, &dbPassword)
+
+		err = row.Scan(&dbUsername, &dbPassword)
 		if err == nil {
 			// 验证用户名密码
 			if (requestData.Username == dbUsername) && (requestData.Password == dbPassword) {
@@ -49,7 +49,6 @@ func LoginPost(c *gin.Context) {
 				value := session.Get("username")
 				if value == nil {
 					session.Set("username", requestData.Username)
-					session.Set("userID", dbUserID)
 					session.Save()
 				}
 
