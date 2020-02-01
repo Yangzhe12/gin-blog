@@ -24,7 +24,7 @@
         <div class="blog-test">
           <div class="blog-nav">
             {{if .username}}
-              <a class="blog-nav-item blog-nav-item-user" href="/v1/edit">写文章</a>
+              <a class="blog-nav-item blog-nav-item-user" href="/v1/md">写文章</a>
               <a class="blog-nav-item blog-nav-item-user" href="#">{{.username}}</a>
               <a class="blog-nav-item blog-nav-item-user" href="/v1/logout">退出</a> 
             {{else}}
@@ -51,45 +51,37 @@
          <!-- 文章块 -->
         {{range $a_key, $a_value:=.content}}
           <div class="blog-post page-header">
-            <h2 class="blog-post-title">{{$a_value.title}}</h2>
-            <p class="blog-post-meta">{{$a_value.pubDateTime}}<a href="#">{{$a_value.user}}</a></p>
-            <blockquote>
-              <p>简述</p>
-            </blockquote>
+            <h2 class="blog-post-title"><a href="/v1/article/{{$a_value.articleID}}">{{$a_value.title}}</a></h2>
+            <p class="blog-post-meta">{{$a_value.pubDateTime}} &bull; <a href="#">{{$a_value.author}}</a></p>
+            <div class="article-list-btn-div">
+              <button type="button" class="btn btn-default btn-blog">
+                <span class="glyphicon glyphicon-heart" aria-hidden="true" ></span> 1234</button>
+              <button type="button" class="btn btn-default btn-blog">
+                <span class="glyphicon glyphicon-comment" aria-hidden="true" ></span> 123</button>
+              
+            </div>
           </div><!-- /.blog-post -->
         {{end}}
-
-          <div class="page-nav">
-            <nav>
-              <ul class="pagination">
-                <li class="disabled">
-                  <span>
-                    <span aria-hidden="true"><</span>
-                  </span>
-                </li>
-                <li class="active">
-                  <span>1<span class="sr-only">(current)</span></span>
-                </li>
-                <li>
-                  <span>2<span class="sr-only"></span></span>
-                </li>
-                <li>
-                  <span>3<span class="sr-only"></span></span>
-                </li>
-                <li>
-                  <span>4<span class="sr-only"></span></span>
-                </li>
-                <li>
-                  <span>5<span class="sr-only"></span></span>
-                </li>
-                <li>
-                  <span>
-                    <span aria-hidden="true">></span>
-                  </span>
-                </li>
-              </ul>
-            </nav>
-          </div>
+        
+        <nav aria-label="...">
+          <ul class="pager">
+            <p id="currentPageNumber" hidden>{{.currentPage}}</p>
+            <p id="totalPageNumber" hidden>{{.totalPage}}</p>
+            {{if eq .currentPage 1}}
+            <li class="disabled"><a id="prePage">上一页</a></li>
+            {{else}}
+            <li><a id="prePage" href="/v1?page={{minus .currentPage 1}}">上一页</a></li>
+            {{end}}
+            
+            <li><a>{{.currentPage}}/{{.totalPage}}</a></li>
+            {{if ge .currentPage .totalPage}}
+            <li class="disabled"><a id="nextPage">下一页</a></li>
+            {{else}}
+            <li><a id="nextPage" href="/v1?page={{add .currentPage 1}}">下一页</a></li>
+            {{end}}
+            
+          </ul>
+        </nav>
           
         </div><!-- /.blog-main -->
 
@@ -132,6 +124,7 @@
     <script src="../static/libs/bootstrap/bootstrap.min.js"></script>
     <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
     <script src="../static/libs/bootstrap/ie10-viewport-bug-workaround.js"></script>
+    
   
 
 </body></html>

@@ -4,6 +4,7 @@ import (
 	"flag"
 	"fmt"
 	"gin-demo/csrf-demo/csrf"
+	"html/template"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -31,7 +32,6 @@ func main() {
 
 	// 数据库连接初始化
 	db, err := utils.InitDB()
-	fmt.Println(db)
 	if err != nil {
 		fmt.Println("err open databases: ", err)
 		return
@@ -39,6 +39,7 @@ func main() {
 	defer db.Close()
 
 	router := gin.Default()
+	setTemplate(router)
 	// 使用redis存储Session
 	redisStroe, err := redis.NewStore(10, "tcp", conf.RedisAddress, "", []byte(conf.CookieSecret))
 	if err != nil {
@@ -55,6 +56,8 @@ func main() {
 	utils.SessionKey = conf.UserInfoSessionKey
 	router.Use(utils.Sessions(conf.UserInfoCookieKey, redisStroe))
 
+	// 用户数和文章数，存入redis
+
 	// 静态文件路径
 	router.LoadHTMLGlob(filepath.Join(filepath.Join(getCurrentDirectory(), "./views/**/*")))
 	router.Static("/static", filepath.Join(getCurrentDirectory(), "./static"))
@@ -65,6 +68,9 @@ func main() {
 		// 请求Handler
 		v1.GET("/", controllers.IndexGet)
 
+		// 查看文章
+		v1.GET("/article/:articleID", controllers.ArticleGet)
+
 		v1.GET("/regist", csrfTokenFunc(), controllers.RegistGet)
 		v1.POST("/regist", csrfTokenFunc(), controllers.RegistPost)
 
@@ -73,8 +79,8 @@ func main() {
 
 		v1.GET("/logout", controllers.LogoutGet)
 
-		v1.GET("/edit", controllers.EditGet)
-		v1.POST("/edit", controllers.EditPost)
+		v1.GET("/md", controllers.MdGet)
+		v1.POST("/md", controllers.MdPost)
 	}
 
 	router.Run(":8080")
@@ -100,4 +106,15 @@ func csrfTokenFunc() gin.HandlerFunc {
 			c.Abort()
 		},
 	})
+}
+
+func setTemplate(engine *gin.Engine) {
+
+	funcMap := template.FuncMap{
+		"add":   utils.Add,
+		"minus": utils.Minus,
+	}
+
+	engine.SetFuncMap(funcMap)
+	engine.LoadHTMLGlob(filepath.Join(getCurrentDirectory(), "./views/**/*"))
 }

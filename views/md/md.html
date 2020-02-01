@@ -1,0 +1,74 @@
+{{define "md/md.html"}}
+<!DOCTYPE html>
+<html>
+<head>
+	{{template "meta.html"}}
+	<title>{{.page}} - YBlog </title>
+	<link rel="stylesheet" href="../../static/editormd/css/editormd.css" />
+	<script src="../../static/libs/bootstrap/jquery.min.js"></script>
+	<script src="../../static/editormd/editormd.min.js"></script>
+  <link rel="stylesheet" href="../../static/editormd/css/mine.css" />
+</head>
+<body>
+  <div id="art-title-area">
+  	<div id="art-title-content">
+		  	<div class="title-div">
+			  <input type="text" id="title-input" name="art-title" placeholder="输入文章标题...">
+			</div>
+			<div class="btn-div">
+				<button id="back-btn" class="art-btn" >返回</button>
+				<button id="post-btn" class="art-btn" >提交</button>
+			</div>
+		  
+  	</div>
+  </div>
+  <div id="editor-area">
+  	<div id="editor" >
+  	    <textarea id="art-textarea" ></textarea>
+  	</div>
+  </div>
+	
+	<script type="text/javascript">
+	    $(function() {
+	        var editor = editormd("editor", {
+	            width  : "100%",
+	            height : "100%",
+	            path   : "../static/editormd/lib/",
+				saveHTMLToTextarea:true,
+	        });
+			$("#back-btn").bind("click",function(){
+				location.href = "/v1";
+			});
+			$("#post-btn").bind("click",function(){
+				var artTitle = $("#title-input").val()
+				var htmlContent = editor.getHTML()
+				var data = {
+					title: artTitle,
+					content: htmlContent,
+					tags:[],
+				}
+				console.log(data)
+
+				var jsonData = JSON.stringify(data)
+				// var tokenData = $("#csrfToken").text()
+				$.ajax({
+					url:"/v1/md",
+      				type:"post",
+					cache:false,
+					data:jsonData,
+					contentType:"application/json",
+					success: function (resp) {
+						alert(resp.msg);
+						location.href = "/v1";
+
+					},
+					error: function (resp) {
+						alert(resp.msg);
+					},
+				});
+			});
+	    });
+	</script>
+</body>
+</html>
+{{end}}
