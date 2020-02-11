@@ -9,7 +9,7 @@
 	<script src="../../static/editormd/editormd.min.js"></script>
   <link rel="stylesheet" href="../../static/editormd/css/mine.css" />
 </head>
-<body>
+<body>	
   <div id="art-title-area">
   	<div id="art-title-content">
 		  	<div class="title-div">
@@ -41,10 +41,12 @@
 			});
 			$("#post-btn").bind("click",function(){
 				var artTitle = $("#title-input").val()
-				var htmlContent = editor.getHTML()
+				// var htmlContent = editor.getHTML()
+				var mdContent = $("#art-textarea").val()
 				var data = {
 					title: artTitle,
-					content: htmlContent,
+					content: mdContent,
+					// content:htmlContent,
 					tags:[],
 				}
 				console.log(data)

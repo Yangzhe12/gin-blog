@@ -62,6 +62,10 @@ func main() {
 	router.LoadHTMLGlob(filepath.Join(filepath.Join(getCurrentDirectory(), "./views/**/*")))
 	router.Static("/static", filepath.Join(getCurrentDirectory(), "./static"))
 
+	router.GET("/", func(c *gin.Context) {
+		c.Redirect(http.StatusMovedPermanently, "/v1")
+	})
+
 	// v1 版本路由
 	v1 := router.Group("/v1")
 	{
@@ -70,6 +74,8 @@ func main() {
 
 		// 查看文章
 		v1.GET("/article/:articleID", controllers.ArticleGet)
+
+		v1.GET("/blog/:username", controllers.UserBlogGet)
 
 		v1.GET("/regist", csrfTokenFunc(), controllers.RegistGet)
 		v1.POST("/regist", csrfTokenFunc(), controllers.RegistPost)

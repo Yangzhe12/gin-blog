@@ -1,6 +1,7 @@
 package utils
 
 import (
+	config "gin-blog/conf"
 	"log"
 	"net/http"
 
@@ -141,4 +142,17 @@ func Default(c *gin.Context) Session {
 // shortcut to get session with given name
 func DefaultMany(c *gin.Context, name string) Session {
 	return c.MustGet(SessionKey).(map[string]Session)[name]
+}
+
+func GetUserInfo(c *gin.Context) string {
+	var currentUser string
+	SessionKey = config.GetConfiguration().UserInfoSessionKey
+	session := Default(c)
+	username := session.Get("username")
+	if username != nil {
+		currentUser = username.(string)
+	} else {
+		currentUser = ""
+	}
+	return currentUser
 }

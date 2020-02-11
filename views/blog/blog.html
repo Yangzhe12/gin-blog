@@ -1,11 +1,11 @@
-{{define "index/index.html"}}
+{{define "blog/blog.html"}}
 <!DOCTYPE html>
 
 <html lang="zh-CN">
   <head>
     {{template "meta.html"}}
     <title>{{.page}} - YBlog </title>
-    {{template "link.html"}}
+    {{template "blog_link.html"}}
     <style type="text/css" abt="234"></style>
     <script>//console.log('a')</script>
   </head>
@@ -15,9 +15,9 @@
     <div class="blog-masthead">
       <div class="container">
         <nav class="blog-nav">
-          <a class="blog-nav-item active" href="#">首页</a>
+          <a class="blog-nav-item" href="/v1">首页</a>
           {{if .currentUser}}
-          <a class="blog-nav-item" href="/v1/blog/{{.currentUser}}">博客</a>
+          <a class="blog-nav-item active" href="/v1/blog/{{.currentUser}}">博客</a>
           {{end}}
           <a class="blog-nav-item" href="#">页面3</a>
           <a class="blog-nav-item" href="#">页面4</a>
@@ -54,7 +54,7 @@
         {{range $a_key, $a_value:=.content}}
           <div class="blog-post page-header">
             <h2 class="blog-post-title"><a href="/v1/article/{{$a_value.articleID}}">{{$a_value.title}}</a></h2>
-            <p class="blog-post-meta">{{$a_value.updDateTime}} &bull; <a href="/v1/blog/{{$a_value.author}}">{{$a_value.author}}</a></p>
+            <p class="blog-post-meta">{{$a_value.updDateTime}} &bull; <a href="#">{{$a_value.author}}</a></p>
             <div class="article-list-btn-div">
               <button type="button" class="btn btn-default btn-blog">
                 <span class="glyphicon glyphicon-heart" aria-hidden="true" ></span> 1234</button>
@@ -71,7 +71,7 @@
 
               <p id="currentPageNumber" hidden>{{.currentPage}}</p>
               <p id="totalPageNumber" hidden>{{.totalPage}}</p>
-              {{if eq .currentPage 1}}
+              {{if le .currentPage 1}}
               <li class="disabled"><a id="prePage">上一页</a></li>
               {{else}}
               <li><a id="prePage" href="/v1?username={{.username}}&page={{minus .currentPage 1}}">上一页</a></li>
@@ -88,7 +88,7 @@
 
               <p id="currentPageNumber" hidden>{{.currentPage}}</p>
               <p id="totalPageNumber" hidden>{{.totalPage}}</p>
-              {{if eq .currentPage 1}}
+              {{if le .currentPage 1}}
               <li class="disabled"><a id="prePage">上一页</a></li>
               {{else}}
               <li><a id="prePage" href="/v1?page={{minus .currentPage 1}}">上一页</a></li>
@@ -108,16 +108,10 @@
           
         </div><!-- /.blog-main -->
 
-        <!--blog-sidebar -->
         <div class="col-sm-3 col-sm-offset-1 blog-sidebar">
           <div class="sidebar-module sidebar-module-inset">
-            <h4>相关技术</h4>
-            <p>后端语言 --- go语言</p>
-            <p>后端框架 --- gin</p>
-            <p>前端框架 --- bootstrap</p>
-            <p>markdown -- editor.md</p>
-            <p>关系数据库 --- MySQL</p>
-            <p>内存数据库 --- Redis</p>
+            <h4>关于本站</h4>
+            <p>Etiam porta <em>sem malesuada magna</em> mollis euismod. Cras mattis consectetur purus sit amet fermentum. Aenean lacinia bibendum nulla sed consectetur.</p>
           </div>
           <div class="sidebar-module sidebar-module-inset">
             <h4>分类</h4>
