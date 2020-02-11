@@ -1,0 +1,82 @@
+{{define "article1/article1.html"}}
+<!DOCTYPE html>
+
+<html lang="zh-CN">
+  <head>
+    {{template "meta.html"}}
+    <title>{{.page}} - YBlog </title>
+    {{template "art_link.html"}}
+    <style type="text/css" abt="234"></style>
+    <script>//console.log('a')</script>
+    <script src="http://strapdownjs.com/v/0.2/strapdown.js"></script>
+  </head>
+
+  <body>
+
+    <div class="blog-masthead">
+      <div class="container">
+        <nav class="blog-nav">
+          <a class="blog-nav-item active" href="/v1">首页</a>
+          {{if .currentUser}}
+          <a class="blog-nav-item" href="/v1/blog/{{.currentUser}}">博客</a>
+          {{end}}
+          <a class="blog-nav-item" href="#">页面3</a>
+          <a class="blog-nav-item" href="#">页面4</a>
+          <a class="blog-nav-item" href="#">页面5</a>
+        </nav>
+        <div class="blog-test">
+          <div class="blog-nav">
+            {{if .username}}
+              <a class="blog-nav-item blog-nav-item-user" href="/v1/md">写文章</a>
+              <a class="blog-nav-item blog-nav-item-user" href="#">{{.username}}</a>
+              <a class="blog-nav-item blog-nav-item-user" href="/v1/logout">退出</a>
+            {{else}}
+              <a class="blog-nav-item blog-nav-item-user" href="/v1/login">登陆</a>
+              <a class="blog-nav-item blog-nav-item-user" href="/v1/regist">注册</a> 
+            {{end}}
+            
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="container">
+      <div class="row">
+        <div class="page-header">
+          <h1 class="blog-title"></h1>
+        </div>
+        <div class="col-sm-8 blog-main" id="containerDiv">
+         <!-- 文章块 -->
+            <div class="blog-post page-header">
+            <h2 class="blog-post-title">{{.title}}</h2>
+            <p class="blog-post-meta">{{.pubDateTime}} &bull; <a href="#">{{.author}}</a></p>
+            </div><!-- /.blog-post -->
+        </div><!-- /.blog-main -->
+      </div><!-- /.row -->
+      <div id="preview-area">
+        <xmp theme="united" style="display:none;"></xmp>
+      </div>
+
+
+    </div><!-- /.container -->
+
+    <footer class="blog-footer">
+      <p><a href="http://getbootstrap.com/">yangzhe</a> 博客</p>
+      <p>
+        <a href="#">回到顶部</a>
+      </p>
+    </footer>
+
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    
+    <script type="text/javascript">
+        $(document).ready(function() { 
+            str = {{.artContent}};
+            console.log(str);
+            $("xmp").append(str);
+         });
+    </script>
+</body></html>
+{{end}}

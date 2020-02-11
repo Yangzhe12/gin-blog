@@ -13,7 +13,7 @@ import (
 func IndexGet(c *gin.Context) {
 	var dbArtIDStr, dbTitle, dbContent, dbAuthor string
 	var dbArticleID int
-	var dbDatetime []uint8
+	var dbUpdDatetime []uint8
 	var respData []map[string]string
 	var currentUser string
 	var articlesNumber int
@@ -24,14 +24,7 @@ func IndexGet(c *gin.Context) {
 		currentPage = 1
 	}
 
-	utils.SessionKey = config.GetConfiguration().UserInfoSessionKey
-	session := utils.Default(c)
-	username := session.Get("username")
-	if username != nil {
-		currentUser = username.(string)
-	} else {
-		currentUser = ""
-	}
+	currentUser = utils.GetUserInfo(c)
 
 	articlesNumberSQL := "select count(title) from article"
 	row := utils.Db.QueryRow(articlesNumberSQL)
@@ -47,13 +40,13 @@ func IndexGet(c *gin.Context) {
 		fmt.Println(err)
 	}
 	for rows.Next() {
-		rows.Scan(&dbArticleID, &dbTitle, &dbContent, &dbDatetime, &dbAuthor)
+		rows.Scan(&dbArticleID, &dbTitle, &dbContent, &dbUpdDatetime, &dbAuthor)
 		dbArtIDStr = strconv.Itoa(dbArticleID)
 		respData = append(respData, map[string]string{
 			"articleID":   dbArtIDStr,
 			"title":       dbTitle,
 			"artContent":  dbContent,
-			"pubDateTime": utils.B2S(dbDatetime),
+			"updDateTime": utils.B2S(dbUpdDatetime),
 			"author":      dbAuthor,
 		})
 	}
@@ -61,8 +54,9 @@ func IndexGet(c *gin.Context) {
 	c.HTML(http.StatusOK, "index/index.html", gin.H{
 		"content":     respData,
 		"page":        "首页",
-		"username":    currentUser,
+		"currentUser": currentUser,
 		"totalPage":   totalPage,
 		"currentPage": currentPage,
+		"username":    "",
 	})
 }
