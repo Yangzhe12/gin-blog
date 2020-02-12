@@ -11,13 +11,10 @@ import (
 )
 
 func IndexGet(c *gin.Context) {
-	var dbArtIDStr, dbTitle, dbContent, dbAuthor string
-	var dbArticleID int
+	var dbArtIDStr, dbTitle, dbContent, dbAuthor, currentUser string
+	var currentPage, totalPage, articlesNumber, dbArticleID int
 	var dbUpdDatetime []uint8
 	var respData []map[string]string
-	var currentUser string
-	var articlesNumber int
-	var currentPage int
 	currentPage, err := strconv.Atoi(c.DefaultQuery("page", "1"))
 	if err != nil {
 		fmt.Println("类型转换错误")
@@ -32,7 +29,11 @@ func IndexGet(c *gin.Context) {
 	if err != nil {
 		fmt.Println(err)
 	}
-	totalPage := (articlesNumber / config.ArticlesPerPage) + 1
+	if (articlesNumber % config.ArticlesPerPage) == 0 {
+		totalPage = (articlesNumber / config.ArticlesPerPage)
+	} else {
+		totalPage = (articlesNumber / config.ArticlesPerPage) + 1
+	}
 
 	indexSQL := fmt.Sprintf("select id,title,content,upd_datetime,author_name from article order by upd_datetime desc limit %d,%d;", (currentPage-1)*config.ArticlesPerPage, config.ArticlesPerPage)
 	rows, err := utils.Db.Query(indexSQL)
