@@ -37,7 +37,7 @@
 				saveHTMLToTextarea:true,
 	        });
 			$("#back-btn").bind("click",function(){
-				location.href = "/v1";
+				location.href = "/";
 			});
 			$("#post-btn").bind("click",function(){
 				var artTitle = $("#title-input").val()
@@ -54,14 +54,14 @@
 				var jsonData = JSON.stringify(data)
 				// var tokenData = $("#csrfToken").text()
 				$.ajax({
-					url:"/v1/md",
+					url:"/md",
       				type:"post",
 					cache:false,
 					data:jsonData,
 					contentType:"application/json",
 					success: function (resp) {
 						alert(resp.msg);
-						location.href = "/v1";
+						location.href = "/";
 
 					},
 					error: function (resp) {

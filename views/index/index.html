@@ -15,9 +15,16 @@
     <div class="blog-masthead">
       <div class="container">
         <nav class="blog-nav">
-          <a class="blog-nav-item active" href="#">首页</a>
-          {{if .currentUser}}
-          <a class="blog-nav-item" href="/v1/blog/{{.currentUser}}">博客</a>
+          {{if .username}}
+            <a class="blog-nav-item" href="/">首页</a>
+            {{if .currentUser}}
+            <a class="blog-nav-item active" href="./blog/{{.currentUser}}">博客</a>
+            {{end}}
+          {{else}}
+            <a class="blog-nav-item active" href="/">首页</a>
+            {{if .currentUser}}
+            <a class="blog-nav-item" href="./blog/{{.currentUser}}">博客</a>
+            {{end}}
           {{end}}
           <a class="blog-nav-item" href="#">页面3</a>
           <a class="blog-nav-item" href="#">页面4</a>
@@ -26,12 +33,12 @@
         <div class="blog-test">
           <div class="blog-nav">
             {{if .currentUser}}
-              <a class="blog-nav-item blog-nav-item-user" href="/v1/md">写文章</a>
-              <a class="blog-nav-item blog-nav-item-user" href="#">{{.currentUser}}</a>
-              <a class="blog-nav-item blog-nav-item-user" href="/v1/logout">退出</a> 
+              <a class="blog-nav-item blog-nav-item-user" href="/md">写文章</a>
+              <a id="currentUsername" class="blog-nav-item blog-nav-item-user" href="#">{{.currentUser}}</a>
+              <a class="blog-nav-item blog-nav-item-user" href="/logout">退出</a> 
             {{else}}
-              <a class="blog-nav-item blog-nav-item-user" href="/v1/login">登陆</a>
-              <a class="blog-nav-item blog-nav-item-user" href="/v1/regist">注册</a> 
+              <a class="blog-nav-item blog-nav-item-user" href="/login">登陆</a>
+              <a class="blog-nav-item blog-nav-item-user" href="/regist">注册</a> 
             {{end}}
             
           </div>
@@ -53,14 +60,12 @@
          <!-- 文章块 -->
         {{range $a_key, $a_value:=.content}}
           <div class="blog-post page-header">
-            <h2 class="blog-post-title"><a href="/v1/article/{{$a_value.articleID}}">{{$a_value.title}}</a></h2>
-            <p class="blog-post-meta">{{$a_value.updDateTime}} &bull; <a href="/v1/blog/{{$a_value.author}}">{{$a_value.author}}</a></p>
+            <h2 class="blog-post-title"><a href="/article/{{$a_value.articleID}}">{{$a_value.title}}</a></h2>
+            <p class="blog-post-meta">{{$a_value.updDateTime}} &bull; <a href="/blog/{{$a_value.author}}">{{$a_value.author}}</a></p>
             <div class="article-list-btn-div">
-              <button type="button" class="btn btn-default btn-blog">
-                <span class="glyphicon glyphicon-heart" aria-hidden="true" ></span> 1234</button>
-              <button type="button" class="btn btn-default btn-blog">
-                <span class="glyphicon glyphicon-comment" aria-hidden="true" ></span> 123</button>
-              
+              <button type="button" class="{{$a_value.isLiked}}" art_id={{$a_value.articleID}} likeStatus={{$a_value.isLiked}}>赞 ({{$a_value.dbLikeNumber}})</button>
+              <button type="button" class="blog-btn">
+                评论 (123)</button>
             </div>
           </div><!-- /.blog-post -->
         {{end}}
@@ -74,14 +79,14 @@
               {{if eq .currentPage 1}}
               <li class="disabled"><a id="prePage">上一页</a></li>
               {{else}}
-              <li><a id="prePage" href="/v1?username={{.username}}&page={{minus .currentPage 1}}">上一页</a></li>
+              <li><a id="prePage" href="/?username={{.username}}&page={{minus .currentPage 1}}">上一页</a></li>
               {{end}}
               
               <li><a>{{.currentPage}}/{{.totalPage}}</a></li>
               {{if ge .currentPage .totalPage}}
               <li class="disabled"><a id="nextPage">下一页</a></li>
               {{else}}
-              <li><a id="nextPage" href="/v1?username={{.username}}&page={{add .currentPage 1}}">下一页</a></li>
+              <li><a id="nextPage" href="/?username={{.username}}&page={{add .currentPage 1}}">下一页</a></li>
               {{end}}
 
             {{else}}
@@ -91,14 +96,14 @@
               {{if eq .currentPage 1}}
               <li class="disabled"><a id="prePage">上一页</a></li>
               {{else}}
-              <li><a id="prePage" href="/v1?page={{minus .currentPage 1}}">上一页</a></li>
+              <li><a id="prePage" href="/?page={{minus .currentPage 1}}">上一页</a></li>
               {{end}}
               
               <li><a>{{.currentPage}}/{{.totalPage}}</a></li>
               {{if ge .currentPage .totalPage}}
               <li class="disabled"><a id="nextPage">下一页</a></li>
               {{else}}
-              <li><a id="nextPage" href="/v1?page={{add .currentPage 1}}">下一页</a></li>
+              <li><a id="nextPage" href="/?page={{add .currentPage 1}}">下一页</a></li>
               {{end}}
 
             {{end}}
@@ -128,7 +133,7 @@
           <div class="sidebar-module sidebar-module-inset">
             <h4>热度排行</h4>
             <ol class="list-unstyled">
-              <li><a href="#">GitHub</a></li>
+              <li><a href="#" >GitHub</a></li>
             </ol>
           </div>
         </div><!-- /.blog-sidebar -->
@@ -153,8 +158,50 @@
     <script src="../../static/libs/bootstrap/bootstrap.min.js"></script>
     <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
     <script src="../../static/libs/bootstrap/ie10-viewport-bug-workaround.js"></script>
-    
-  
-
+    <script>
+      // 根据是否点赞，设置点赞按钮颜色
+      $(".article-list-btn-div button:first-child").bind("click",function(){
+          console.log($(this).text())
+          var thisButton = $(this)
+          var currentUser = ""
+          currentUser = $("#currentUsername").text()
+          var likedArticle = $(this).attr("art_id")
+          if (currentUser == ""){
+            console.log("未登陆...." + likedArticle)
+            location.href = "/login";
+          } else {
+            console.log("已登陆...." + likedArticle)
+            var data = {
+              currentUser:currentUser,
+              likedArticleID:likedArticle,
+            }
+            var jsonData = JSON.stringify(data)
+            $.ajax({
+              url:"/liked",
+              type:"post",
+              data:jsonData,
+              contentType:"application/json",
+              success: function (resp) {
+                if(thisButton.attr("likeStatus")== "liked") {
+                  console.log(thisButton.text())
+                  thisButton.removeClass("liked")
+                  thisButton.addClass("unliked")
+                  thisButton.attr("likeStatus","unliked")
+                } else {
+                  console.log(thisButton.text())
+                  thisButton.removeClass("unliked")
+                  thisButton.addClass("liked")
+                  thisButton.attr("likeStatus","liked")
+                }
+                var likedNumberStr = resp.likedNumber
+                thisButton.text("赞 ("+likedNumberStr+")")
+              },
+              error: function (resp) {
+                alert(resp.msg);
+              },
+            });
+          };
+        });
+    </script>
 </body></html>
 {{end}}

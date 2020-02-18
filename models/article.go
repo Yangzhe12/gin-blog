@@ -16,3 +16,9 @@ type Tag struct {
 	ID      int
 	TagName string
 }
+
+// LikedData 点赞数据结构体
+type LikedData struct {
+	CurrentUsername string `json:"currentUser"`
+	LikedArticleID  string `json:"likedArticleID"`
+}

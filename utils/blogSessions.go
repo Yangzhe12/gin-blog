@@ -144,6 +144,7 @@ func DefaultMany(c *gin.Context, name string) Session {
 	return c.MustGet(SessionKey).(map[string]Session)[name]
 }
 
+// GetUserInfo 获取Session中存储的当前用户的用户名
 func GetUserInfo(c *gin.Context) string {
 	var currentUser string
 	SessionKey = config.GetConfiguration().UserInfoSessionKey
