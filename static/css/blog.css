@@ -303,3 +303,18 @@ h6, .h6 {
   margin: auto;
   display: inline-block;
 }
+
+.blog-btn {
+  font-size: 14px;
+  color: black;
+}
+.liked {
+  font-size: 14px;
+  color: red;
+}
+.unliked {
+  font-size: 14px;
+  color: black;
+}
+
+

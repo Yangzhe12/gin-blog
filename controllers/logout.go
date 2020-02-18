@@ -15,5 +15,5 @@ func LogoutGet(c *gin.Context) {
 	session.Delete("userID")
 	session.Save()
 	c.Header("Cache-Control", "no-cache")
-	c.Redirect(http.StatusFound, "/v1")
+	c.Redirect(http.StatusFound, "/")
 }

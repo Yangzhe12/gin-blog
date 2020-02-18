@@ -38,6 +38,10 @@ func main() {
 	}
 	defer db.Close()
 
+	// redis连接池初始化
+	redisPool := utils.InitRedisPool()
+	defer redisPool.Close()
+
 	router := gin.Default()
 	setTemplate(router)
 	// 使用redis存储Session
@@ -62,32 +66,33 @@ func main() {
 	router.LoadHTMLGlob(filepath.Join(filepath.Join(getCurrentDirectory(), "./views/**/*")))
 	router.Static("/static", filepath.Join(getCurrentDirectory(), "./static"))
 
-	router.GET("/", func(c *gin.Context) {
-		c.Redirect(http.StatusMovedPermanently, "/v1")
-	})
+	// 路由
+	// 请求Handler
+	router.GET("/", controllers.IndexGet)
 
-	// v1 版本路由
-	v1 := router.Group("/v1")
-	{
-		// 请求Handler
-		v1.GET("/", controllers.IndexGet)
+	// 查看文章
+	router.GET("/article/:articleID", controllers.ArticleGet)
 
-		// 查看文章
-		v1.GET("/article/:articleID", controllers.ArticleGet)
+	// 用户文章列表
+	router.GET("/blog/:username", controllers.UserBlogGet)
 
-		v1.GET("/blog/:username", controllers.UserBlogGet)
+	// 注册
+	router.GET("/regist", csrfTokenFunc(), controllers.RegistGet)
+	router.POST("/regist", csrfTokenFunc(), controllers.RegistPost)
 
-		v1.GET("/regist", csrfTokenFunc(), controllers.RegistGet)
-		v1.POST("/regist", csrfTokenFunc(), controllers.RegistPost)
+	// 登陆
+	router.GET("/login", csrfTokenFunc(), controllers.LoginGet)
+	router.POST("/login", csrfTokenFunc(), controllers.LoginPost)
 
-		v1.GET("/login", csrfTokenFunc(), controllers.LoginGet)
-		v1.POST("/login", csrfTokenFunc(), controllers.LoginPost)
+	// 退出登陆
+	router.GET("/logout", controllers.LogoutGet)
 
-		v1.GET("/logout", controllers.LogoutGet)
+	// 写文章
+	router.GET("/md", controllers.MdGet)
+	router.POST("/md", controllers.MdPost)
 
-		v1.GET("/md", controllers.MdGet)
-		v1.POST("/md", controllers.MdPost)
-	}
+	// 点赞
+	router.POST("/liked", controllers.LikePost)
 
 	router.Run(":8080")
 }

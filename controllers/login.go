@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"database/sql"
+	"fmt"
 	config "gin-blog/conf"
 	"gin-blog/models"
 	"gin-blog/utils"
@@ -17,9 +18,12 @@ func LoginGet(c *gin.Context) {
 	session := utils.Default(c)
 	v := session.Get("username")
 	if v != nil {
+		fmt.Println("------------------------1")
 		c.Redirect(http.StatusMovedPermanently, "/v1")
 	} else {
+		fmt.Println("------------------------2")
 		csrfToken := utrackcsrf.GetToken(c)
+		fmt.Println("------------------------3")
 		c.HTML(http.StatusOK, "account/login.html", gin.H{
 			"page":      "登陆",
 			"csrfToken": csrfToken,

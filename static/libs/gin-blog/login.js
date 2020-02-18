@@ -23,7 +23,7 @@ $(document).ready(function(){
     var tokenData = $("#csrfToken").text()
 
     $.ajax({
-      url:"/v1/login",
+      url:"/login",
       type:"post",
       data:jsonData,
       headers:{
@@ -33,7 +33,7 @@ $(document).ready(function(){
       success: function (resp) {
         if (resp.resno == "0") {
           alert(resp.msg)
-          location.href = "/v1";
+          location.href = "/";
         } else {
           if (resp.resno == "1") {
             alert(resp.msg)
