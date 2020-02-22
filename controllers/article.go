@@ -16,7 +16,7 @@ func ArticleGet(c *gin.Context) {
 		dbTitle       string  // 从数据库中获取的文章标题
 		dbContent     string  // 从数据库中获取的文章内容
 		dbAuthor      string  // 从数据库中获取的文章作者
-		dbArticleID   int     // 从数据库中获取的文章ID
+		dbPageView    int     // 从数据库中获取的文章访问量
 		dbPubDatetime []uint8 // 从数据库中获取的文章发表时间
 		dbUpdDatetime []uint8 // 从数据库中获取的文章更新时间
 	)
@@ -31,21 +31,30 @@ func ArticleGet(c *gin.Context) {
 	// 获取当前登陆的用户
 	currentUser := utils.GetUserInfo(c)
 
+	// 增加访问次数
+	incrPageViewSQL := "update article set pageview=pageview+1 where id=?;"
+	_, err = utils.Db.Exec(incrPageViewSQL, articleID)
+	if err != nil {
+		fmt.Println("增加访问次数失败：", err)
+	}
+
 	// 从数据库中查询所查看文章的数据
-	queryArtSQL := "select id,title,content,pub_datetime,upd_datetime,author_name from article where id=?;"
+	queryArtSQL := "select title,content,pageview,pub_datetime,upd_datetime,author_name from article where id=?;"
 	row := utils.Db.QueryRow(queryArtSQL, articleID)
-	err = row.Scan(&dbArticleID, &dbTitle, &dbContent, &dbPubDatetime, &dbUpdDatetime, &dbAuthor)
-	// 让字符串不转义为html格式
+	err = row.Scan(&dbTitle, &dbContent, &dbPageView, &dbPubDatetime, &dbUpdDatetime, &dbAuthor)
 	if err != nil {
 		fmt.Println(err)
 	}
+	// 让字符串不转义为html格式
 	articleCotent := template.HTML(dbContent)
+
 	c.HTML(http.StatusOK, "article/article.html", gin.H{
 		"page":          dbTitle,
 		"username":      currentUser,
-		"articleID":     dbArticleID,
+		"articleID":     articleID,
 		"title":         dbTitle,
 		"articleCotent": articleCotent,
+		"pageView":      dbPageView,
 		"pubDateTime":   utils.B2S(dbPubDatetime),
 		"updDateTime":   utils.B2S(dbUpdDatetime),
 		"author":        dbAuthor,

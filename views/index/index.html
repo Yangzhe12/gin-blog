@@ -61,7 +61,7 @@
         {{range $a_key, $a_value:=.content}}
           <div class="blog-post page-header">
             <h2 class="blog-post-title"><a href="/article/{{$a_value.articleID}}">{{$a_value.title}}</a></h2>
-            <p class="blog-post-meta">{{$a_value.updDateTime}} &bull; <a href="/blog/{{$a_value.author}}">{{$a_value.author}}</a> &bull; {{$a_value.pageView}}</p>
+            <p class="blog-post-meta">{{$a_value.updDateTime}} &bull; <a href="/blog/{{$a_value.author}}">{{$a_value.author}}</a> &bull; 访问量：{{$a_value.pageView}}</p>
             <div class="article-list-btn-div">
               <button type="button" class="{{$a_value.isLiked}}" art_id={{$a_value.articleID}} likedStatus={{$a_value.isLiked}}>赞 ({{$a_value.dbLikeNumber}})</button>
               <button type="button" class="blog-btn">
