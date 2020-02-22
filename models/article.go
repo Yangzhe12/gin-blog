@@ -19,6 +19,7 @@ type Tag struct {
 
 // LikedData 点赞数据结构体
 type LikedData struct {
-	CurrentUsername string `json:"currentUser"`
-	LikedArticleID  string `json:"likedArticleID"`
+	CurrentUsername string `json:"currentUser"`    // 当前登陆的用户名
+	LikedArticleID  string `json:"likedArticleID"` // 点赞的文章id
+	LikedStatus     string `json:"likedStatus"`    // 当前点赞状态
 }

@@ -2,29 +2,36 @@ package controllers
 
 import (
 	"fmt"
-	config "gin-blog/conf"
 	"gin-blog/models"
 	"gin-blog/utils"
 	"html/template"
 	"net/http"
 	"strconv"
 
-	"github.com/gomodule/redigo/redis"
-
 	"github.com/gin-gonic/gin"
 )
 
 func ArticleGet(c *gin.Context) {
-	var dbTitle, dbContent, dbAuthor string
-	var dbArticleID int
-	var dbPubDatetime, dbUpdDatetime []uint8
+	var (
+		dbTitle       string  // 从数据库中获取的文章标题
+		dbContent     string  // 从数据库中获取的文章内容
+		dbAuthor      string  // 从数据库中获取的文章作者
+		dbArticleID   int     // 从数据库中获取的文章ID
+		dbPubDatetime []uint8 // 从数据库中获取的文章发表时间
+		dbUpdDatetime []uint8 // 从数据库中获取的文章更新时间
+	)
+
+	// 取出请求中文章的ID，并转为int类型
 	articleID, err := strconv.Atoi(c.Param("articleID"))
 	if err != nil {
 		fmt.Println(err)
 		c.String(http.StatusNotFound, "找不到文章！")
 		return
 	}
+	// 获取当前登陆的用户
 	currentUser := utils.GetUserInfo(c)
+
+	// 从数据库中查询所查看文章的数据
 	queryArtSQL := "select id,title,content,pub_datetime,upd_datetime,author_name from article where id=?;"
 	row := utils.Db.QueryRow(queryArtSQL, articleID)
 	err = row.Scan(&dbArticleID, &dbTitle, &dbContent, &dbPubDatetime, &dbUpdDatetime, &dbAuthor)
@@ -34,7 +41,7 @@ func ArticleGet(c *gin.Context) {
 	}
 	articleCotent := template.HTML(dbContent)
 	c.HTML(http.StatusOK, "article/article.html", gin.H{
-		"page":          "文章内容",
+		"page":          dbTitle,
 		"username":      currentUser,
 		"articleID":     dbArticleID,
 		"title":         dbTitle,
@@ -50,10 +57,9 @@ func unescaped(x string) interface{} {
 	return template.HTML(x)
 }
 
+// 处理点赞文章
 func LikePost(c *gin.Context) {
-	// 获取请求中的JSON数据
-	var likedStatus, likedNumberStr string
-	var likedNumber int
+	// 获取请求中的JSON数据，当前登陆的用户名，点赞的文章的id
 	var likedData models.LikedData
 	if err := c.ShouldBindJSON(&likedData); err != nil {
 		// 获取请求Json失败
@@ -61,96 +67,63 @@ func LikePost(c *gin.Context) {
 			"resno": 1,
 			"msg":   "数据错误，请稍后再试！",
 		})
-	}
-
-	// 连接redis
-	redisConn, err := redis.Dial("tcp", config.GetConfiguration().RedisAddress)
-	if err != nil {
-		fmt.Println(err)
-		c.JSON(http.StatusServiceUnavailable, gin.H{
-			"resno": 2,
-			"msg":   "服务器繁忙，请稍后再试！",
-		})
 		return
 	}
-	defer redisConn.Close()
+
 	// 拼接redis中hash键的格式
-	hashKey := fmt.Sprintf("%s::%s", likedData.CurrentUsername, likedData.LikedArticleID)
-	// 获取redis中相关点赞数据
-	redisLikedData, err := redisConn.Do("hget", "likedData", hashKey)
+	statusKey := fmt.Sprintf("%s::%s", likedData.CurrentUsername, likedData.LikedArticleID)
+	numberKey := fmt.Sprintf("article::%s", likedData.LikedArticleID)
+
+	// 如果当前已经点赞，则取消点赞，并设置redis中的数据
+	newStatus, newNumber, err := handleRedisLikedData(likedData.LikedStatus, statusKey, numberKey)
 	if err != nil {
 		fmt.Println(err)
+		return
 	}
+	c.JSON(http.StatusOK, gin.H{
+		"resno":       0,
+		"likedStatus": newStatus,
+		"likedNumber": newNumber,
+		"msg":         "操作成功",
+	})
+}
 
-	// 处理查询结果
-	if redisLikedData != nil {
-		likedStatus = utils.RedisGetStringResult(redisLikedData)
+// handleRedisLikedData 处理点赞/取消点赞
+func handleRedisLikedData(curStatus string, statusKey string, numberKey string) (newStatus string, newNumber string, err error) {
+	redisConn := utils.RedisPool.Get()
+	defer redisConn.Close()
+	// 当前用户已经点赞过本文章
+	if curStatus == "liked" {
+		_, err = redisConn.Do("HSET", "likedData", statusKey, 0)
+		if err != nil {
+			fmt.Println("1----", err)
+			return "", "", err
+		}
+		newStatus = "unliked"
+		_, err = redisConn.Do("HINCRBY", "articleLikeNumber", numberKey, -1)
+		if err != nil {
+			fmt.Println("2----", err)
+			return "", "", err
+		}
 	} else {
-		likedStatus = "0"
+		// 当前用户未点赞过本文章
+		_, err = redisConn.Do("HSET", "likedData", statusKey, 1)
+		if err != nil {
+			fmt.Println("3----", err)
+			return "", "", err
+		}
+		newStatus = "liked"
+		_, err = redisConn.Do("HINCRBY", "articleLikeNumber", numberKey, 1)
+		if err != nil {
+			fmt.Println("4----", err)
+			return "", "", err
+		}
 	}
-
-	// 获取redis中的文章点赞数量
-	likedNumberHashKey := "article::" + likedData.LikedArticleID
-	redisLikedNumber, err := redisConn.Do("hget", "articleLikeNumber", likedNumberHashKey)
+	newNumberObj, err := redisConn.Do("HGET", "articleLikeNumber", numberKey)
 	if err != nil {
-		fmt.Println(err)
-	} else {
-		// redis中无点赞数
-		if redisLikedNumber == nil {
-			getLikedNumSQL := "select like_num from article where id=?;"
-			likedRow := utils.Db.QueryRow(getLikedNumSQL, likedData.LikedArticleID)
-			err = likedRow.Scan(&likedNumber)
-			if err != nil {
-				fmt.Println(err)
-			}
-		} else {
-			likedNumberStr = utils.RedisGetStringResult(redisLikedNumber)
-			likedNumber, _ = strconv.Atoi(likedNumberStr)
-		}
+		fmt.Println("5----", err)
+		return "", "", err
 	}
-
-	if likedStatus == "0" {
-		// 当前登陆用户没有点赞过该文章
-		_, err = redisConn.Do("hmset", "likedData", hashKey, "1")
-		if err != nil {
-			c.JSON(http.StatusServiceUnavailable, gin.H{
-				"resno": 3,
-				"msg":   "点赞失败",
-			})
-		} else {
-			// 更新点赞数
-			likedNumberStr = strconv.Itoa(likedNumber + 1)
-			_, err = redisConn.Do("hmset", "articleLikeNumber", likedNumberHashKey, likedNumberStr)
-			if err != nil {
-				fmt.Println(err)
-			}
-			c.JSON(http.StatusOK, gin.H{
-				"resno":       0,
-				"likedStatus": "liked",
-				"likedNumber": likedNumberStr,
-				"msg":         "点赞成功",
-			})
-		}
-	} else {
-		// 当前登陆用户已经点赞过该文章，再次点击取消点赞
-		_, err = redisConn.Do("hmset", "likedData", hashKey, "0")
-		if err != nil {
-			c.JSON(http.StatusServiceUnavailable, gin.H{
-				"resno": 4,
-				"msg":   "取消点赞失败",
-			})
-		} else {
-			likedNumberStr = strconv.Itoa(likedNumber - 1)
-			_, err = redisConn.Do("hmset", "articleLikeNumber", likedNumberHashKey, likedNumberStr)
-			if err != nil {
-				fmt.Println(err)
-			}
-			c.JSON(http.StatusOK, gin.H{
-				"resno":       0,
-				"likedStatus": "unliked",
-				"likedNumber": likedNumberStr,
-				"msg":         "取消点赞",
-			})
-		}
-	}
+	newNumber = utils.RedisGetStringResult(newNumberObj)
+	return newStatus, newNumber, nil
 }

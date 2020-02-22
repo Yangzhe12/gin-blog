@@ -23,6 +23,8 @@ func GetArticleList(c *gin.Context, username string) {
 		dbTitle         string              // 数据库中文章标题
 		dbContent       string              // 数据库中文章内容
 		dbAuthor        string              // 数据库中文章作者
+		dbPageView      int                 // 数据库中文章访问量
+		dbPageViewStr   string              // 数据库中文章访问量对应字符串
 		dbLikeNumberStr string              // 数据库中文章点赞数对应字符串
 		currentUser     string              // 当前登陆的用户
 		hashKeyPrefix   string              // redis哈希类型键的前缀
@@ -59,11 +61,12 @@ func GetArticleList(c *gin.Context, username string) {
 
 	// 从数据库去除当前页文章数据
 	if username == "" {
-		sqlString = fmt.Sprintf("select id,title,content,upd_datetime,author_name, like_num from article order by upd_datetime desc limit %d,%d;", (currentPage-1)*config.ArticlesPerPage, config.ArticlesPerPage)
+		// 首页文章查询
+		sqlString = fmt.Sprintf("select title,content,pageview,upd_datetime,author_name, like_num from article order by upd_datetime desc limit %d,%d;", (currentPage-1)*config.ArticlesPerPage, config.ArticlesPerPage)
 	} else {
-		sqlString = fmt.Sprintf("select id,title,content,upd_datetime,author_name, like_num from article where author_name=? order by upd_datetime desc limit %d,%d;", (currentPage-1)*config.ArticlesPerPage, config.ArticlesPerPage)
+		// 当前登陆用户文章列表查询
+		sqlString = fmt.Sprintf("select title,content,pageview,upd_datetime,author_name, like_num from article where author_name=? order by upd_datetime desc limit %d,%d;", (currentPage-1)*config.ArticlesPerPage, config.ArticlesPerPage)
 	}
-
 	rows, err := getCurrentPageArticles(currentPage, sqlString, username)
 	if err != nil {
 		fmt.Println(err)
@@ -77,8 +80,9 @@ func GetArticleList(c *gin.Context, username string) {
 
 	for rows.Next() {
 		// 获取文章相关数据
-		rows.Scan(&dbArticleID, &dbTitle, &dbContent, &dbUpdDatetime, &dbAuthor, &dbLikeNumber)
+		rows.Scan(&dbTitle, &dbContent, &dbPageView, &dbUpdDatetime, &dbAuthor, &dbLikeNumber)
 		dbArtIDStr = strconv.Itoa(dbArticleID)
+		dbPageViewStr = strconv.Itoa(dbPageView)
 		// 获取点赞状态
 		if hashKeyPrefix != "" {
 			likedStatus = getLikedStatus(hashKeyPrefix, dbArtIDStr)
@@ -88,11 +92,11 @@ func GetArticleList(c *gin.Context, username string) {
 		// 获取点赞数
 		likedNumberHashKey := "article::" + dbArtIDStr
 		dbLikeNumberStr = getLikedNumber(likedNumberHashKey, strconv.Itoa(dbLikeNumber))
-		fmt.Println("______________", username)
 		respData = append(respData, map[string]string{
 			"articleID":    dbArtIDStr,
 			"title":        dbTitle,
 			"artContent":   dbContent,
+			"pageView":     dbPageViewStr,
 			"updDateTime":  utils.B2S(dbUpdDatetime),
 			"author":       dbAuthor,
 			"dbLikeNumber": dbLikeNumberStr,
