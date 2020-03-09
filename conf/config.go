@@ -16,6 +16,7 @@ type Configuration struct {
 	UserInfoSessionSecret    string `yaml:"userinfo_session_secret"`
 	UserInfoSessionKey       string `yaml:"userinfo_session_key"`
 	UserInfoCookieKey        string `yaml:"userinfo_cookie_key"`
+	PageViewFlagExpiTime     int    `yaml:"page_view_expi_time"`
 }
 
 const (

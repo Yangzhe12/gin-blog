@@ -7,3 +7,4 @@ userinfo_session_valid_time: 2592000
 userinfo_session_secret: 7f269b66c7517c1b24142a09c98de4476f813098
 userinfo_session_key: userinfo
 userinfo_cookie_key: user_cookie
+page_view_expi_time: 1200

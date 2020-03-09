@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"fmt"
+	config "gin-blog/conf"
 	"gin-blog/models"
 	"gin-blog/utils"
 	"html/template"
@@ -18,7 +19,6 @@ func ArticleGet(c *gin.Context) {
 		dbAuthor      string  // 从数据库中获取的文章作者
 		dbPageView    int     // 从数据库中获取的文章访问量
 		dbPubDatetime []uint8 // 从数据库中获取的文章发表时间
-		dbUpdDatetime []uint8 // 从数据库中获取的文章更新时间
 	)
 
 	// 取出请求中文章的ID，并转为int类型
@@ -32,31 +32,35 @@ func ArticleGet(c *gin.Context) {
 	currentUser := utils.GetUserInfo(c)
 
 	// 增加访问次数
-	incrPageViewSQL := "update article set pageview=pageview+1 where id=?;"
-	_, err = utils.Db.Exec(incrPageViewSQL, articleID)
-	if err != nil {
-		fmt.Println("增加访问次数失败：", err)
+	// 查询10分钟内是否访问过该文章
+	tooOften := isPageViewInRedis(strconv.Itoa(articleID), currentUser)
+	if !tooOften {
+		// 没有太频繁的时候，才更新数据库中的数据
+		incrPageViewSQL := "update article set pageview=pageview+1 where id=?;"
+		_, err = utils.Db.Exec(incrPageViewSQL, articleID)
+		if err != nil {
+			fmt.Println("增加访问次数失败：", err)
+		}
 	}
 
-	// 从数据库中查询所查看文章的数据
-	queryArtSQL := "select title,content,pageview,pub_datetime,upd_datetime,author_name from article where id=?;"
+	// 从数据库中查询指定的文章的数据
+	queryArtSQL := "select title,content,pageview,pub_datetime,author_name from article where id=?;"
 	row := utils.Db.QueryRow(queryArtSQL, articleID)
-	err = row.Scan(&dbTitle, &dbContent, &dbPageView, &dbPubDatetime, &dbUpdDatetime, &dbAuthor)
+	err = row.Scan(&dbTitle, &dbContent, &dbPageView, &dbPubDatetime, &dbAuthor)
 	if err != nil {
 		fmt.Println(err)
 	}
+
 	// 让字符串不转义为html格式
 	articleCotent := template.HTML(dbContent)
-
 	c.HTML(http.StatusOK, "article/article.html", gin.H{
 		"page":          dbTitle,
 		"username":      currentUser,
 		"articleID":     articleID,
 		"title":         dbTitle,
 		"articleCotent": articleCotent,
-		"pageView":      dbPageView,
+		"pageView":      strconv.Itoa(dbPageView),
 		"pubDateTime":   utils.B2S(dbPubDatetime),
-		"updDateTime":   utils.B2S(dbUpdDatetime),
 		"author":        dbAuthor,
 	})
 }
@@ -135,4 +139,21 @@ func handleRedisLikedData(curStatus string, statusKey string, numberKey string) 
 	}
 	newNumber = utils.RedisGetStringResult(newNumberObj)
 	return newStatus, newNumber, nil
+}
+
+// isPageViewInRedis 查询redis中有无当前用户访问文章的数据
+// 如果规定时间重复访问，不增加访问量数据
+func isPageViewInRedis(articleID string, username string) bool {
+	hashKey := username + "::" + articleID
+	redisConn := utils.RedisPool.Get()
+	defer redisConn.Close()
+	res, err := redisConn.Do("GET", hashKey)
+	if err != nil {
+		fmt.Println(err)
+		return false
+	}
+	// redis中不存在访问量数据，设置;
+	// redis中存在访问量数据，更新过期时间
+	_, _ = redisConn.Do("SETEX", hashKey, config.GetConfiguration().PageViewFlagExpiTime, "1")
+	return (res != nil)
 }

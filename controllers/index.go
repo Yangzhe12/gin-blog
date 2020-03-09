@@ -34,7 +34,7 @@ func GetArticleList(c *gin.Context, username string) {
 		articlesNumber  int                 // 总文章数量
 		dbArticleID     int                 // 数据库中文章的id，整型
 		dbLikeNumber    int                 // 数据库中文章的点赞数
-		dbUpdDatetime   []uint8             // 数据库中文章更新时间
+		dbPubDatetime   []uint8             // 数据库中文章更新时间
 		respData        []map[string]string // 最终返回的数据
 	)
 	currentPage, err := strconv.Atoi(c.DefaultQuery("page", "1"))
@@ -60,9 +60,9 @@ func GetArticleList(c *gin.Context, username string) {
 
 	// 从数据库去除当前页文章数据
 	if username == "" {
-		sqlString = fmt.Sprintf("select id,title,content,pageview,upd_datetime,author_name, like_num from article order by upd_datetime desc limit %d,%d;", (currentPage-1)*config.ArticlesPerPage, config.ArticlesPerPage)
+		sqlString = fmt.Sprintf("select id,title,content,pageview,pub_datetime,author_name, like_num from article order by upd_datetime desc limit %d,%d;", (currentPage-1)*config.ArticlesPerPage, config.ArticlesPerPage)
 	} else {
-		sqlString = fmt.Sprintf("select id,title,content,pageview,upd_datetime,author_name, like_num from article where author_name=? order by upd_datetime desc limit %d,%d;", (currentPage-1)*config.ArticlesPerPage, config.ArticlesPerPage)
+		sqlString = fmt.Sprintf("select id,title,content,pageview,pub_datetime,author_name, like_num from article where author_name=? order by upd_datetime desc limit %d,%d;", (currentPage-1)*config.ArticlesPerPage, config.ArticlesPerPage)
 	}
 
 	rows, err := getCurrentPageArticles(currentPage, sqlString, username)
@@ -78,7 +78,7 @@ func GetArticleList(c *gin.Context, username string) {
 
 	for rows.Next() {
 		// 获取文章相关数据
-		rows.Scan(&dbArticleID, &dbTitle, &dbContent, &dbPageView, &dbUpdDatetime, &dbAuthor, &dbLikeNumber)
+		rows.Scan(&dbArticleID, &dbTitle, &dbContent, &dbPageView, &dbPubDatetime, &dbAuthor, &dbLikeNumber)
 		dbArtIDStr = strconv.Itoa(dbArticleID)
 		// 获取点赞状态
 		if hashKeyPrefix != "" {
@@ -94,7 +94,7 @@ func GetArticleList(c *gin.Context, username string) {
 			"title":        dbTitle,
 			"artContent":   dbContent,
 			"pageView":     strconv.Itoa(dbPageView),
-			"updDateTime":  utils.B2S(dbUpdDatetime),
+			"pubDateTime":  utils.B2S(dbPubDatetime),
 			"author":       dbAuthor,
 			"dbLikeNumber": dbLikeNumberStr,
 			"isLiked":      likedStatus,
