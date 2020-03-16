@@ -16,3 +16,16 @@ func RedisGetStringResult(strRes interface{}) string {
 	res := string(strByte)
 	return res
 }
+
+// JointKey 拼接redis的key
+func JointKey(args ...interface{}) string {
+	var result string
+	for k, s := range args {
+		if k == 0 {
+			result = fmt.Sprintf("%v", s)
+		} else {
+			result = fmt.Sprintf("%s::%v", result, s)
+		}
+	}
+	return result
+}

@@ -12,14 +12,9 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// ArticleGet 处理  /article/:articleID  的GET请求
 func ArticleGet(c *gin.Context) {
-	var (
-		dbTitle       string  // 从数据库中获取的文章标题
-		dbContent     string  // 从数据库中获取的文章内容
-		dbAuthor      string  // 从数据库中获取的文章作者
-		dbPageView    int     // 从数据库中获取的文章访问量
-		dbPubDatetime []uint8 // 从数据库中获取的文章发表时间
-	)
+	var dbData models.Article
 
 	// 取出请求中文章的ID，并转为int类型
 	articleID, err := strconv.Atoi(c.Param("articleID"))
@@ -36,32 +31,30 @@ func ArticleGet(c *gin.Context) {
 	tooOften := isPageViewInRedis(strconv.Itoa(articleID), currentUser)
 	if !tooOften {
 		// 没有太频繁的时候，才更新数据库中的数据
-		incrPageViewSQL := "update article set pageview=pageview+1 where id=?;"
-		_, err = utils.Db.Exec(incrPageViewSQL, articleID)
+		_, err = utils.Db.Exec(utils.AddArtPageviewSQL, articleID)
 		if err != nil {
 			fmt.Println("增加访问次数失败：", err)
 		}
 	}
 
 	// 从数据库中查询指定的文章的数据
-	queryArtSQL := "select title,content,pageview,pub_datetime,author_name from article where id=?;"
-	row := utils.Db.QueryRow(queryArtSQL, articleID)
-	err = row.Scan(&dbTitle, &dbContent, &dbPageView, &dbPubDatetime, &dbAuthor)
+	row := utils.Db.QueryRow(utils.QueryArtByIDSQL, articleID)
+	err = row.Scan(&dbData.Title, &dbData.Content, &dbData.Pageview, &dbData.PubDatetime, &dbData.AuthorName)
 	if err != nil {
 		fmt.Println(err)
 	}
 
 	// 让字符串不转义为html格式
-	articleCotent := template.HTML(dbContent)
+	articleCotent := template.HTML(dbData.Content)
 	c.HTML(http.StatusOK, "article/article.html", gin.H{
-		"page":          dbTitle,
+		"page":          dbData.Title,
 		"username":      currentUser,
 		"articleID":     articleID,
-		"title":         dbTitle,
+		"title":         dbData.Title,
 		"articleCotent": articleCotent,
-		"pageView":      strconv.Itoa(dbPageView),
-		"pubDateTime":   utils.B2S(dbPubDatetime),
-		"author":        dbAuthor,
+		"pageView":      strconv.Itoa(dbData.Pageview),
+		"pubDateTime":   utils.B2S(dbData.PubDatetime),
+		"author":        dbData.AuthorName,
 	})
 }
 
@@ -70,7 +63,7 @@ func unescaped(x string) interface{} {
 	return template.HTML(x)
 }
 
-// 处理点赞文章
+// LikePost 处理点赞文章
 func LikePost(c *gin.Context) {
 	// 获取请求中的JSON数据，当前登陆的用户名，点赞的文章的id
 	var likedData models.LikedData
@@ -84,8 +77,9 @@ func LikePost(c *gin.Context) {
 	}
 
 	// 拼接redis中hash键的格式
-	statusKey := fmt.Sprintf("%s::%s", likedData.CurrentUsername, likedData.LikedArticleID)
-	numberKey := fmt.Sprintf("article::%s", likedData.LikedArticleID)
+	statusKey := utils.JointKey(likedData.CurrentUsername, likedData.LikedArticleID)
+
+	numberKey := utils.JointKey("article", likedData.LikedArticleID)
 
 	// 如果当前已经点赞，则取消点赞，并设置redis中的数据
 	newStatus, newNumber, err := handleRedisLikedData(likedData.LikedStatus, statusKey, numberKey)
@@ -102,11 +96,11 @@ func LikePost(c *gin.Context) {
 }
 
 // handleRedisLikedData 处理点赞/取消点赞
-func handleRedisLikedData(curStatus string, statusKey string, numberKey string) (newStatus string, newNumber string, err error) {
+func handleRedisLikedData(oldStatus string, statusKey string, numberKey string) (newStatus string, newNumber string, err error) {
 	redisConn := utils.RedisPool.Get()
 	defer redisConn.Close()
 	// 当前用户已经点赞过本文章
-	if curStatus == "liked" {
+	if oldStatus == "liked" {
 		_, err = redisConn.Do("HSET", "likedData", statusKey, 0)
 		if err != nil {
 			fmt.Println("1----", err)

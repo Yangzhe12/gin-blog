@@ -6,9 +6,11 @@ type Article struct {
 	Title       string   `json:"title"`
 	Content     string   `json:"content"`
 	ArticleTag  []string `json:"tags"`
-	PubDatetime string
-	UpdDatetime string
-	AuthorID    int
+	PubDatetime []uint8
+	UpdDatetime []uint8
+	AuthorName  string
+	Pageview    int
+	LikeNum     int
 }
 
 // Tag 结构体
