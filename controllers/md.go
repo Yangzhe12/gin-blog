@@ -52,8 +52,7 @@ func MdPost(c *gin.Context) {
 		}
 		username := value.(string)
 		// 将文章保存到数据库
-		AddArtcleSQL := "insert into article (title, content, author_name) values (?,?,?)"
-		_, err := utils.Db.Exec(AddArtcleSQL, requestData.Title, requestData.Content, username)
+		_, err := utils.Db.Exec(utils.AddArticleSQL, requestData.Title, requestData.Content, username)
 		if err != nil {
 			c.JSON(http.StatusNotImplemented, gin.H{
 				"resno": 5,

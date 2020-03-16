@@ -4,7 +4,7 @@
 <html lang="zh-CN">
   <head>
     {{template "meta.html"}}
-    <title>{{.page}} - YBlog </title>
+    <title> {{if .username}} {{.username}} 的文章 {{else}} {{.page}} {{end}} - YBlog </title>
     {{template "link.html"}}
     <style type="text/css" abt="234"></style>
     <script>//console.log('a')</script>
